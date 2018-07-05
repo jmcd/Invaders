@@ -1,0 +1,62 @@
+<html>
+
+<body>
+
+    <canvas id="canvas" height="224" width="256" />
+
+    <script src="build/app.js"></script>
+
+    <script>
+        'use strict'
+
+        var joystick = new jmcd.SpaceInvaders.Joystick();
+
+        function switchForKey(keyName) {
+            switch (keyName) {
+                case "KeyZ": return jmcd.SpaceInvaders.JoystickSwitch.Left;
+                case "KeyX": return jmcd.SpaceInvaders.JoystickSwitch.Right;
+                case "Enter": return jmcd.SpaceInvaders.JoystickSwitch.Fire;
+            }
+            return undefined;
+        }
+
+        document.addEventListener('keydown', (event) => {
+            var sw = switchForKey(event.code);
+            if (sw !== undefined) {
+                joystick.press(sw);
+            }
+        });
+
+        document.addEventListener('keyup', (event) => {
+            var sw = switchForKey(event.code);
+            if (sw !== undefined) {
+                joystick.depress(sw);
+            }
+        });
+
+        var canvas = document.getElementById("canvas");
+
+        var ctx2d = this.canvas.getContext("2d");
+
+        var bg = ctx2d.getImageData(0, 0, 800, 600);
+
+        var game = undefined
+        function loop(timestamp) {
+            if (game === undefined) {
+                game = new jmcd.SpaceInvaders.Game(joystick);
+            }
+            game.update(timestamp);
+            var imageDataOrNull = game.redrawnImageDataOrNull(timestamp, bg);
+            if (imageDataOrNull != null) {
+                ctx2d.putImageData(imageDataOrNull, 0, 0);
+            }
+            window.requestAnimationFrame(loop);
+        }
+        window.requestAnimationFrame(loop);
+
+
+
+    </script>
+</body>
+
+</html>
